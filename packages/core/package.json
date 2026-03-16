@@ -1,0 +1,26 @@
+{
+  "name": "@nami/core",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "tree-sitter": "^0.22.4",
+    "tree-sitter-swift": "^0.7.1",
+    "zod": "^3.24"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.7",
+    "vitest": "^3.0"
+  }
+}

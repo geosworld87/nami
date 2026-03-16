@@ -1,0 +1,25 @@
+{
+  "name": "@nami/web",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "cytoscape": "^3.33.1",
+    "cytoscape-dagre": "^2.5.0",
+    "react": "^19.0",
+    "react-dom": "^19.0"
+  },
+  "devDependencies": {
+    "@types/cytoscape": "^3.21.9",
+    "@types/react": "^19.0",
+    "@types/react-dom": "^19.0",
+    "@vitejs/plugin-react": "^4.0",
+    "typescript": "^5.7",
+    "vite": "^6.0",
+    "vitest": "^3.0"
+  }
+}

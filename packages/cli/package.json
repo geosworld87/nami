@@ -1,0 +1,23 @@
+{
+  "name": "@nami/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "nami": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@nami/core": "*",
+    "@nami/server": "*",
+    "commander": "^14.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7",
+    "vitest": "^3.0",
+    "@types/node": "^22"
+  }
+}
