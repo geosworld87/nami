@@ -3,13 +3,15 @@ export const SERVER_VERSION = "0.1.0";
 import express from "express";
 import cors from "cors";
 import { readFileSync, existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
+import { execSync } from "node:child_process";
 import {
   deserialize,
   analyzeBlastRadius,
   analyzeCoverage,
   generateSuggestions,
   computeMetrics,
+  computeHealthScore,
 } from "@nami/core";
 import type { NamiGraph } from "@nami/core";
 
@@ -67,17 +69,76 @@ export function createServer(options: ServerOptions) {
     }
   });
 
-  // GET /api/metrics — coverage, suggestions, metrics
+  // GET /api/metrics — coverage, suggestions, metrics, health
   app.get("/api/metrics", (_req, res) => {
     try {
       const graph = loadGraph();
+      const coverage = analyzeCoverage(graph);
+      const suggestions = generateSuggestions(graph);
       res.json({
-        coverage: analyzeCoverage(graph),
-        suggestions: generateSuggestions(graph),
+        coverage,
+        suggestions,
         metrics: computeMetrics(graph),
+        health: computeHealthScore(graph, coverage, suggestions),
       });
     } catch (err) {
       res.status(500).json({ error: "Failed to compute metrics" });
+    }
+  });
+
+  // GET /api/repo-info — git activity & version for the scanned repo
+  app.get("/api/repo-info", (_req, res) => {
+    try {
+      const graph = loadGraph();
+      const repoPath = graph.rootPath;
+      const gitOpts = { cwd: repoPath, encoding: "utf-8" as const, timeout: 5000 };
+
+      let branch: string | null = null;
+      try {
+        branch = execSync("git rev-parse --abbrev-ref HEAD", gitOpts).trim();
+      } catch { /* not a git repo */ }
+
+      let lastCommit: { sha: string; date: string; author: string } | null = null;
+      try {
+        const log = execSync("git log -1 --format=%H|%ai|%an", gitOpts).trim();
+        const parts = log.split("|");
+        if (parts.length >= 3) {
+          lastCommit = { sha: parts[0].slice(0, 8), date: parts[1], author: parts.slice(2).join("|") };
+        }
+      } catch { /* no commits */ }
+
+      let contributors: Array<{ name: string; commits: number }> = [];
+      try {
+        const shortlog = execSync("git shortlog -sn --no-merges HEAD", gitOpts).trim();
+        contributors = shortlog
+          .split("\n")
+          .filter(Boolean)
+          .slice(0, 5)
+          .map((line) => {
+            const match = line.trim().match(/^(\d+)\s+(.+)$/);
+            return match ? { commits: parseInt(match[1], 10), name: match[2] } : null;
+          })
+          .filter((c): c is { name: string; commits: number } => c !== null);
+      } catch { /* no git */ }
+
+      let version: string | null = null;
+      // Try package.json
+      try {
+        const pkg = JSON.parse(readFileSync(join(repoPath, "package.json"), "utf-8"));
+        if (pkg.version) version = pkg.version;
+      } catch { /* no package.json */ }
+      // Try .version file
+      if (!version) {
+        try {
+          version = readFileSync(join(repoPath, ".version"), "utf-8").trim();
+        } catch { /* no .version file */ }
+      }
+
+      const repoName = repoPath.replace(/\/+$/, "").split("/").pop() ?? "unknown";
+
+      res.json({ repoName, version, branch, lastCommit, contributors });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to get repo info" });
     }
   });
 

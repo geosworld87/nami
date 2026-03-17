@@ -34,3 +34,10 @@ export { generateSuggestions } from "./analyzer/suggestions.js";
 export type { Suggestion, SuggestionSeverity, SuggestionCategory } from "./analyzer/suggestions.js";
 export { computeMetrics } from "./analyzer/metrics.js";
 export type { MetricsResult } from "./analyzer/metrics.js";
+export { computeHealthScore } from "./analyzer/health-score.js";
+export type {
+  HealthScoreResult,
+  EntityHealthScore,
+  ModuleHealthScore,
+  HealthGrade,
+} from "./analyzer/health-score.js";

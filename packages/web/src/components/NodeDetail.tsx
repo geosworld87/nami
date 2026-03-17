@@ -12,7 +12,6 @@ interface NodeDetailProps {
 export function NodeDetail({ node, graph, onBlastRadius, onClose }: NodeDetailProps) {
   const [loadingBlast, setLoadingBlast] = useState(false);
 
-  // Find incoming and outgoing edges
   const incoming = graph.edges.filter(
     (e) => e.target === node.id || e.target === node.name,
   );
@@ -32,20 +31,24 @@ export function NodeDetail({ node, graph, onBlastRadius, onClose }: NodeDetailPr
   };
 
   return (
-    <div style={{
-      position: "absolute",
-      right: 0,
-      top: 0,
-      bottom: 0,
-      width: 360,
-      background: "#16213e",
-      color: "#e0e0e0",
-      padding: 20,
-      overflowY: "auto",
-      borderLeft: "1px solid #333",
-      fontFamily: "system-ui, sans-serif",
-      fontSize: 13,
-    }}>
+    <div
+      className="nami-glass"
+      style={{
+        position: "absolute",
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: 360,
+        color: "#e0e0e0",
+        padding: 20,
+        overflowY: "auto",
+        borderRadius: 0,
+        borderLeft: "1px solid rgba(255,255,255,0.08)",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        fontSize: 13,
+        zIndex: 20,
+      }}
+    >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <h2 style={{ margin: 0, fontSize: 18, color: "#fff" }}>{node.name}</h2>
         <button onClick={onClose} style={{
@@ -163,7 +166,7 @@ function Badge({ kind }: { kind: string }) {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div style={{
-      background: "#0f3460",
+      background: "var(--nami-surface)",
       borderRadius: 6,
       padding: "8px 12px",
     }}>

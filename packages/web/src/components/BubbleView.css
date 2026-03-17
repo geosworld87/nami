@@ -1,0 +1,177 @@
+/* === Nami Bubble View === */
+
+:root {
+  --nami-bg: #1a1a2e;
+  --nami-panel: rgba(22, 33, 62, 0.75);
+  --nami-surface: #0f3460;
+  --nami-border: rgba(255, 255, 255, 0.08);
+  --nami-text: #e0e0e0;
+  --nami-text-dim: #888;
+  --nami-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --transition-normal: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === Glass morphism base === */
+.nami-glass {
+  background: var(--nami-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--nami-border);
+  box-shadow: var(--nami-shadow);
+  border-radius: 12px;
+}
+
+/* === SVG container === */
+.bubble-view-container {
+  width: 100%;
+  height: 100%;
+  background: var(--nami-bg);
+  overflow: hidden;
+  cursor: grab;
+}
+
+.bubble-view-container:active {
+  cursor: grabbing;
+}
+
+.bubble-view-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* === Bubble animations === */
+.bubble-group.visible {
+  opacity: 1;
+}
+
+/* === Semantic zoom transitions === */
+.burst-in .bubble-group {
+  animation: burst 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.collapse-out .bubble-group {
+  animation: collapse 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+}
+
+@keyframes collapse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+/* New bubbles appearing after semantic zoom */
+.bubble-group {
+  animation: appear 350ms cubic-bezier(0.0, 0, 0.2, 1) both;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* === Bubble circles === */
+.bubble-circle-outer {
+  transition: r var(--transition-normal), opacity var(--transition-normal);
+  cursor: pointer;
+}
+
+.bubble-circle-inner {
+  transition: r var(--transition-normal), opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.bubble-circle-outer:hover {
+  filter: brightness(1.3);
+}
+
+/* === Bubble label === */
+.bubble-label {
+  fill: #ffffff;
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.bubble-value {
+  fill: rgba(255, 255, 255, 0.5);
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 400;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* === Blast radius states === */
+.bubble-highlighted .bubble-circle-outer {
+  filter: url(#glow-blast);
+}
+
+.bubble-dimmed {
+  opacity: 0.15;
+  transition: opacity var(--transition-normal);
+}
+
+/* === Search match === */
+.bubble-search-match .bubble-circle-outer {
+  filter: url(#glow-search);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* === Tooltip === */
+.bubble-tooltip {
+  position: absolute;
+  padding: 8px 12px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: #fff;
+  pointer-events: none;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.bubble-tooltip .tooltip-name {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.bubble-tooltip .tooltip-detail {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+}

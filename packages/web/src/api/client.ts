@@ -45,6 +45,36 @@ export interface BlastRadiusResult {
   maxDepth: number;
 }
 
+export type HealthGrade = "healthy" | "warning" | "critical";
+
+export interface EntityHealthScore {
+  entityId: string;
+  name: string;
+  module: string;
+  score: number;
+  grade: HealthGrade;
+  breakdown: {
+    coveragePenalty: number;
+    complexityPenalty: number;
+    couplingPenalty: number;
+    issuesPenalty: number;
+  };
+}
+
+export interface ModuleHealthScore {
+  module: string;
+  score: number;
+  grade: HealthGrade;
+  entityCount: number;
+}
+
+export interface HealthScoreResult {
+  overall: number;
+  overallGrade: HealthGrade;
+  entities: EntityHealthScore[];
+  modules: ModuleHealthScore[];
+}
+
 export interface MetricsResponse {
   coverage: {
     coveragePercentage: number;
@@ -71,6 +101,21 @@ export interface MetricsResponse {
     entityBreakdown: Record<string, number>;
     edgeBreakdown: Record<string, number>;
   };
+  health?: HealthScoreResult;
+}
+
+export interface RepoInfo {
+  repoName: string;
+  version: string | null;
+  branch: string | null;
+  lastCommit: { sha: string; date: string; author: string } | null;
+  contributors: Array<{ name: string; commits: number }>;
+}
+
+export async function fetchRepoInfo(): Promise<RepoInfo> {
+  const res = await fetch(`${API_BASE}/repo-info`);
+  if (!res.ok) throw new Error("Failed to fetch repo info");
+  return res.json();
 }
 
 export async function fetchGraph(): Promise<NamiGraph> {
